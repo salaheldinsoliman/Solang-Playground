@@ -8,6 +8,10 @@ const consoleChannel = document.getElementById("channel-console") as HTMLTextAre
 export default class Client extends jsrpc.JSONRPCServerAndClient {
   afterInitializedHooks: (() => Promise<void>)[] = [];
   #fromServer: FromServer;
+  diagnostic: proto.PublishDiagnosticsParams = {
+    uri: "",
+    diagnostics: [],
+  };
 
   constructor(fromServer: FromServer, intoServer: IntoServer) {
     super(
@@ -70,7 +74,18 @@ export default class Client extends jsrpc.JSONRPCServerAndClient {
   }
 
   async processNotifications(): Promise<void> {
+    console.log("processNotifications called");
     for await (const notification of this.#fromServer.notifications) {
+
+
+      if (notification.method == "textDocument/publishDiagnostics") {
+        // delete the old diagnostics
+
+        this.diagnostic = notification.params as proto.PublishDiagnosticsParams;
+
+        console.log("diagnostics: ", this.diagnostic);
+      }
+
       await this.receiveAndSend(notification);
     }
   }

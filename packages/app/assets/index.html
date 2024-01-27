@@ -27,11 +27,12 @@
     </p>
     <div id="cell-editor">
       <label for="editor">editor</label>
+      <style>
+        #editor {
+          width: 100%;
+        }
+      </style>
       <div id="editor"></div>
-    </div>
-    <div id="cell-syntax">
-      <label for="channel-syntax">syntax</label>
-      <textarea id="channel-syntax" autocomplete="off" spellcheck="off" wrap="off" readonly></textarea>
     </div>
     <div id="cell-console">
       <label for="channel-console">console</label>
@@ -43,7 +44,7 @@
     </div>
     <div id="cell-server">
       <label for="channel-server">message trace (client ⇐ server)</label>
-      <textarea id="channel-server" autocomplete="off" spellcheck="off" wrap="off" readonly rows="4"></textarea>
+      <textarea id="channel-server" autocomplete="off" spellcheck="off" wrap="off" readonly rows="8"></textarea>
     </div>
   </div>
 </body>

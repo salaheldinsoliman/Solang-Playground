@@ -5,6 +5,12 @@ use futures::stream::TryStreamExt;
 use tower_lsp::{LspService, Server};
 use wasm_bindgen::{prelude::*, JsCast};
 use wasm_bindgen_futures::stream::JsStream;
+use solang::languageserver::{SolangServer, Files, FileCache, GlobalCache};
+use std::
+    collections::{HashMap, HashSet};
+use tokio::sync::Mutex;
+
+use solang::Target;
 
 #[wasm_bindgen]
 pub struct ServerConfig {
@@ -39,8 +45,6 @@ pub async fn serve(config: ServerConfig) -> Result<(), JsValue> {
         from_server,
     } = config;
 
-    tree_sitter::TreeSitter::init().await?;
-    let language = demo_lsp_language::language::javascript().await.unwrap();
 
     let input = JsStream::from(into_server);
     let input = input
@@ -57,7 +61,29 @@ pub async fn serve(config: ServerConfig) -> Result<(), JsValue> {
     let output = wasm_streams::WritableStream::from_raw(output);
     let output = output.try_into_async_write().map_err(|err| err.0)?;
 
-    let (service, messages) = LspService::new(|client| demo_lsp_server::Server::new(client, language));
+    let importpaths = Vec::new();
+    let importmaps = Vec::new();
+
+    let (service, messages) = LspService::new(|client| SolangServer {
+        client,
+        target: Target::Solana,
+        importpaths,
+        importmaps,
+        files: Mutex::new(Files {
+            caches: HashMap::new(),
+            text_buffers: HashMap::new(),
+        }),
+        global_cache: Mutex::new(GlobalCache {
+            definitions: HashMap::new(),
+            types: HashMap::new(),
+            implementations: HashMap::new(),
+            declarations: HashMap::new(),
+            properties: HashMap::new(),
+        }),
+    });
+
+
+        
     Server::new(input, output, messages).serve(service).await;
 
     Ok(())

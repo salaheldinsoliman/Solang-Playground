@@ -6,7 +6,6 @@ opt-level = "z"
 [workspace]
 members = [
   "crates/browser",
-  "crates/language",
-  "crates/server",
+  "crates/solang"
 ]
 default-members = ["crates/browser"]

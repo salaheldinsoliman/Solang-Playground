@@ -12,8 +12,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 console_error_panic_hook = "0.1.7"
-demo-lsp-language = { version = "0.0", path = "../language" }
-demo-lsp-server = { version = "0.0", path = "../server", default-features = false }
+solang = { path = "../solang" }
 futures = "0.3.21"
 js-sys = "0.3.57"
 tower-lsp = { version = "0.17.0", default-features = false }
@@ -22,6 +21,9 @@ wasm-bindgen = "0.2.81"
 wasm-bindgen-futures = { version = "0.4.30", features = ["futures-core-03-stream"] }
 wasm-streams = "0.2.3"
 web-tree-sitter-sys = "1.3"
+tokio = { version = "1.27", features = ["rt", "macros", "sync", "io-util"] }
+
+
 
 [dependencies.web-sys]
 version = "0.3.57"

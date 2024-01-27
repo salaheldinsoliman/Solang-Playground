@@ -18,10 +18,16 @@ export default class StreamDemuxer extends Queue<Uint8Array> {
   }
 
   private async start(): Promise<void> {
+
+    console.log("RESPONSES", this.responses);
     let contentLength: null | number = null;
     let buffer = new Uint8Array();
 
     for await (const bytes of this) {
+
+
+      //console.log("bytes", bytes);
+
       buffer = Bytes.append(Uint8Array, buffer, bytes);
 
       // check if the content length is known
@@ -57,6 +63,7 @@ export default class StreamDemuxer extends Queue<Uint8Array> {
 
       // demux the message stream
       if (vsrpc.Message.isResponse(message) && null != message.id) {
+
         this.responses.set(message.id, message);
         continue;
       }
