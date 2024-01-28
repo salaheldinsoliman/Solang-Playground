@@ -1,6 +1,6 @@
 import debounce from "debounce";
 import * as monaco from "monaco-editor-core";
-import { MonacoToProtocolConverter } from "monaco-languageclient";
+import { MonacoToProtocolConverter, ProtocolToMonacoConverter } from "monaco-languageclient";
 import * as proto from "vscode-languageserver-protocol";
 
 import Client from "./client";
@@ -17,6 +17,8 @@ class Environment implements monaco.Environment {
   }
 }
 
+//export const monacoToProtocol = new MonacoToProtocolConverter(monaco);
+export const protocolToMonaco = new ProtocolToMonacoConverter(monaco);
 const monacoToProtocol = new MonacoToProtocolConverter(monaco);
 
 export default class App {
@@ -33,11 +35,18 @@ export default class App {
     const language = Language.initialize(client);
 
     const value = `
-function foo() {
-}
-const bar = 42;
-var baz;
-class Qux {}
+    // SPDX-License-Identifier: MIT
+    pragma solidity >=0.6.12 <0.9.0;
+    
+    contract HelloWorld {
+      /**
+       * @dev Prints Hello World string
+       */
+      function print() public pure returns (string memory) {
+        return "Hello World!";
+      }
+    }
+    
 `.replace(/^\s*\n/gm, "");
     const id = language.id;
     const uri = monaco.Uri.parse("inmemory://demo.js");
@@ -59,6 +68,15 @@ class Qux {}
             },
           ],
         } as proto.DidChangeTextDocumentParams);
+
+        // Wait for a bit before publishing diagnostics
+        setTimeout(() => {
+          let diagnostic = client.diagnostic;
+
+          let markers = protocolToMonaco.asDiagnostics(diagnostic.diagnostics);
+
+          monaco.editor.setModelMarkers(model, "solidity", markers);
+        }, 500); // Adjust delay as needed
       }, 200),
     );
 

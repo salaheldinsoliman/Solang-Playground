@@ -81,6 +81,8 @@ export default class Client extends jsrpc.JSONRPCServerAndClient {
       if (notification.method == "textDocument/publishDiagnostics") {
         // delete the old diagnostics
 
+        this.diagnostic.diagnostics = [];
+
         this.diagnostic = notification.params as proto.PublishDiagnosticsParams;
 
         console.log("diagnostics: ", this.diagnostic);

@@ -171,27 +171,7 @@ export default class Language implements monaco.languages.ILanguageExtensionPoin
       colors: {
 
       }
-      /*colors: {
-        // see https://code.visualstudio.com/api/references/theme-color for more settings
-        //'editor.background': darkColor,
-        /* 'editor.background': '#000000', // Set the background color
-         'editor.foreground': '#ffffff', // Set the foreground color
-         'editorSuggestWidget.background': lightColor,
-         'editorSuggestWidget.selectedBackground': secondaryColor,
-         'editorSuggestWidget.selectedForeground': textColor,
-         'editorSuggestWidget.highlightForeground': primaryColor,
-         'editorSuggestWidget.focusHighlightForeground': infoColor,
-         'editor.lineHighlightBorder': textbackground,
-         'editor.lineHighlightBackground': textbackground === darkColor ? lightColor : secondaryColor,
-         'editorGutter.background': lightColor,
-         //'editor.selectionHighlightBackground': secondaryColor,
-         'minimap.background': lightColor,
-         'menu.foreground': textColor,
-         'menu.background': textbackground,
-         'menu.selectionBackground': secondaryColor,
-         'menu.selectionForeground': textColor,
-         'menu.selectionBorder': secondaryColor,
-      },*/
+
     })
     monaco.editor.setTheme(themeName);
 
@@ -258,12 +238,19 @@ export default class Language implements monaco.languages.ILanguageExtensionPoin
 
 
 
-    monaco.editor.onDidCreateModel((model) => {
-
+    /*monaco.editor.onDidCreateModel((model) => {
+      client.notify(proto.DidSaveTextDocumentNotification.type.method, {
+        textDocument: monacoToProtocol.asTextDocumentIdentifier(model),
+      } as proto.DidSaveTextDocumentParams);
 
       model.onDidChangeContent((event) => {
 
         console.log("content changed", event);
+
+        // send save notification to server
+        client.notify(proto.DidSaveTextDocumentNotification.type.method, {
+          textDocument: monacoToProtocol.asTextDocumentIdentifier(model),
+        } as proto.DidSaveTextDocumentParams);
 
         // get the diagnostics from the client and set them on the model
         let diagnostic = client.diagnostic;
@@ -272,9 +259,13 @@ export default class Language implements monaco.languages.ILanguageExtensionPoin
 
         monaco.editor.setModelMarkers(model, "solidity", markers);
 
+        client.notify(proto.DidSaveTextDocumentNotification.type.method, {
+          textDocument: monacoToProtocol.asTextDocumentIdentifier(model),
+        } as proto.DidSaveTextDocumentParams);
+
       });
 
-    });
+    });*/
 
 
 
