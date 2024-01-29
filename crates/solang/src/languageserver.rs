@@ -2400,11 +2400,11 @@ impl LanguageServer for SolangServer {
                 )),
                 hover_provider: Some(HoverProviderCapability::Simple(true)),
                 completion_provider: Some(CompletionOptions {
+                    completion_item:None,
                     resolve_provider: Some(false),
                     trigger_characters: Some(vec![".".to_string()]),
                     all_commit_characters: None,
                     work_done_progress_options: Default::default(),
-                    //completion_item: None,
                 }),
                 signature_help_provider: Some(SignatureHelpOptions {
                     trigger_characters: None,
