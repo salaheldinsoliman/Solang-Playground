@@ -82,6 +82,8 @@ export default class App {
 
 
 
+
+
     // eslint-disable-next-line @typescript-eslint/require-await
     client.pushAfterInitializeHook(async () => {
       client.notify(proto.DidOpenTextDocumentNotification.type.method, {

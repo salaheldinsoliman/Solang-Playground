@@ -238,39 +238,23 @@ export default class Language implements monaco.languages.ILanguageExtensionPoin
 
 
 
-    /*monaco.editor.onDidCreateModel((model) => {
-      client.notify(proto.DidSaveTextDocumentNotification.type.method, {
-        textDocument: monacoToProtocol.asTextDocumentIdentifier(model),
-      } as proto.DidSaveTextDocumentParams);
+    monaco.editor.onDidCreateModel((model) => {
 
-      model.onDidChangeContent((event) => {
-
+      setTimeout(() => {
         console.log("content changed", event);
-
-        // send save notification to server
-        client.notify(proto.DidSaveTextDocumentNotification.type.method, {
-          textDocument: monacoToProtocol.asTextDocumentIdentifier(model),
-        } as proto.DidSaveTextDocumentParams);
-
-        // get the diagnostics from the client and set them on the model
         let diagnostic = client.diagnostic;
 
         let markers = protocolToMonaco.asDiagnostics(diagnostic.diagnostics);
 
         monaco.editor.setModelMarkers(model, "solidity", markers);
-
-        client.notify(proto.DidSaveTextDocumentNotification.type.method, {
-          textDocument: monacoToProtocol.asTextDocumentIdentifier(model),
-        } as proto.DidSaveTextDocumentParams);
-
-      });
-
-    });*/
+      }, 500);
 
 
 
 
 
+
+    });
 
 
   }
