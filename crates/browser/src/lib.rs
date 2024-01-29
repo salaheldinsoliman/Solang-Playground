@@ -5,9 +5,8 @@ use futures::stream::TryStreamExt;
 use tower_lsp::{LspService, Server};
 use wasm_bindgen::{prelude::*, JsCast};
 use wasm_bindgen_futures::stream::JsStream;
-use solang::languageserver::{SolangServer, Files, FileCache, GlobalCache};
-use std::
-    collections::{HashMap, HashSet};
+use solang::languageserver::{SolangServer, Files, GlobalCache};
+use std::collections::HashMap;
 use tokio::sync::Mutex;
 
 use solang::Target;

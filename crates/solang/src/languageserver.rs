@@ -7,7 +7,6 @@ use itertools::Itertools;
 use num_traits::ToPrimitive;
 use rust_lapper::{Interval, Lapper};
 use serde_json::Value;
-use tower_lsp::jsonrpc::{Response, self};
 use crate::codegen::{self, codegen, Expression};
 use crate::file_resolver::FileResolver;
 use crate::parse_and_resolve;
@@ -29,7 +28,7 @@ use std::{
 };
 use tokio::sync::Mutex;
 use tower_lsp::{
-    jsonrpc::{Result},
+    jsonrpc::Result,
     lsp_types::{
         request::{
             GotoDeclarationParams, GotoDeclarationResponse, GotoImplementationParams,
@@ -39,7 +38,7 @@ use tower_lsp::{
         CompletionTriggerKind, DeclarationCapability, Diagnostic, DiagnosticRelatedInformation,
         DiagnosticSeverity, DidChangeConfigurationParams, DidChangeTextDocumentParams,
         DidChangeWatchedFilesParams, DidChangeWorkspaceFoldersParams, DidCloseTextDocumentParams,
-        DidOpenTextDocumentParams, DidSaveTextDocumentParams, DocumentFormattingParams,
+        DidOpenTextDocumentParams, DidSaveTextDocumentParams, 
         ExecuteCommandOptions, ExecuteCommandParams, GotoDefinitionParams, GotoDefinitionResponse,
         Hover, HoverContents, HoverParams, HoverProviderCapability,
         ImplementationProviderCapability, InitializeParams, InitializeResult, InitializedParams,
@@ -49,15 +48,10 @@ use tower_lsp::{
         TypeDefinitionProviderCapability, Url, WorkspaceEdit, WorkspaceFoldersServerCapabilities,
         WorkspaceServerCapabilities, 
     },
-    Client, LanguageServer, LspService, Server,
+    Client, LanguageServer,
 };
-use tokio::io::{AsyncWriteExt, AsyncReadExt, AsyncRead, AsyncWrite, BufWriter, AsyncBufRead, BufStream};
 
 
-use futures::stream::TryStreamExt;
-
-use wasm_bindgen::{prelude::*, JsCast};
-use wasm_bindgen_futures::stream::JsStream;
 
 
 /// Represents the type of the code object that a reference points to
@@ -207,342 +201,6 @@ pub struct SolangServer {
     pub global_cache: Mutex<GlobalCache>,
 }
 
-
-
-const REQUEST: &str = r#"{"jsonrpc":"2.0","method":"initialize","params": {
-    "processId": 8000,
-    "clientInfo": {
-        "name": "vscode",
-        "version": "1.85.1"
-    },
-    "rootPath": "d:\\solang_fork_final",
-    "rootUri": "file:///d%3A/solang_fork_final",
-    "capabilities": {
-        "workspace": {
-            "applyEdit": true,
-            "workspaceEdit": {
-                "documentChanges": true,
-                "resourceOperations": [
-                    "create",
-                    "rename",
-                    "delete"
-                ],
-                "failureHandling": "textOnlyTransactional"
-            },
-            "didChangeConfiguration": {
-                "dynamicRegistration": true
-            },
-            "didChangeWatchedFiles": {
-                "dynamicRegistration": true
-            },
-            "symbol": {
-                "dynamicRegistration": true,
-                "symbolKind": {
-                    "valueSet": [
-                        1,
-                        2,
-                        3,
-                        4,
-                        5,
-                        6,
-                        7,
-                        8,
-                        9,
-                        10,
-                        11,
-                        12,
-                        13,
-                        14,
-                        15,
-                        16,
-                        17,
-                        18,
-                        19,
-                        20,
-                        21,
-                        22,
-                        23,
-                        24,
-                        25,
-                        26
-                    ]
-                }
-            },
-            "executeCommand": {
-                "dynamicRegistration": true
-            },
-            "configuration": true,
-            "workspaceFolders": true
-        },
-        "textDocument": {
-            "publishDiagnostics": {
-                "relatedInformation": true,
-                "versionSupport": false,
-                "tagSupport": {
-                    "valueSet": [
-                        1,
-                        2
-                    ]
-                }
-            },
-            "synchronization": {
-                "dynamicRegistration": true,
-                "willSave": true,
-                "willSaveWaitUntil": true,
-                "didSave": true
-            },
-            "completion": {
-                "dynamicRegistration": true,
-                "contextSupport": true,
-                "completionItem": {
-                    "snippetSupport": true,
-                    "commitCharactersSupport": true,
-                    "documentationFormat": [
-                        "markdown",
-                        "plaintext"
-                    ],
-                    "deprecatedSupport": true,
-                    "preselectSupport": true,
-                    "tagSupport": {
-                        "valueSet": [
-                            1
-                        ]
-                    }
-                },
-                "completionItemKind": {
-                    "valueSet": [
-                        1,
-                        2,
-                        3,
-                        4,
-                        5,
-                        6,
-                        7,
-                        8,
-                        9,
-                        10,
-                        11,
-                        12,
-                        13,
-                        14,
-                        15,
-                        16,
-                        17,
-                        18,
-                        19,
-                        20,
-                        21,
-                        22,
-                        23,
-                        24,
-                        25
-                    ]
-                }
-            },
-            "hover": {
-                "dynamicRegistration": true,
-                "contentFormat": [
-                    "markdown",
-                    "plaintext"
-                ]
-            },
-            "signatureHelp": {
-                "dynamicRegistration": true,
-                "signatureInformation": {
-                    "documentationFormat": [
-                        "markdown",
-                        "plaintext"
-                    ],
-                    "parameterInformation": {
-                        "labelOffsetSupport": true
-                    }
-                },
-                "contextSupport": true
-            },
-            "definition": {
-                "dynamicRegistration": true,
-                "linkSupport": true
-            },
-            "references": {
-                "dynamicRegistration": true
-            },
-            "documentHighlight": {
-                "dynamicRegistration": true
-            },
-            "documentSymbol": {
-                "dynamicRegistration": true,
-                "symbolKind": {
-                    "valueSet": [
-                        1,
-                        2,
-                        3,
-                        4,
-                        5,
-                        6,
-                        7,
-                        8,
-                        9,
-                        10,
-                        11,
-                        12,
-                        13,
-                        14,
-                        15,
-                        16,
-                        17,
-                        18,
-                        19,
-                        20,
-                        21,
-                        22,
-                        23,
-                        24,
-                        25,
-                        26
-                    ]
-                },
-                "hierarchicalDocumentSymbolSupport": true
-            },
-            "codeAction": {
-                "dynamicRegistration": true,
-                "isPreferredSupport": true,
-                "codeActionLiteralSupport": {
-                    "codeActionKind": {
-                        "valueSet": [
-                            "",
-                            "quickfix",
-                            "refactor",
-                            "refactor.extract",
-                            "refactor.inline",
-                            "refactor.rewrite",
-                            "source",
-                            "source.organizeImports"
-                        ]
-                    }
-                }
-            },
-            "codeLens": {
-                "dynamicRegistration": true
-            },
-            "formatting": {
-                "dynamicRegistration": true
-            },
-            "rangeFormatting": {
-                "dynamicRegistration": true
-            },
-            "onTypeFormatting": {
-                "dynamicRegistration": true
-            },
-            "rename": {
-                "dynamicRegistration": true,
-                "prepareSupport": true
-            },
-            "documentLink": {
-                "dynamicRegistration": true,
-                "tooltipSupport": true
-            },
-            "typeDefinition": {
-                "dynamicRegistration": true,
-                "linkSupport": true
-            },
-            "implementation": {
-                "dynamicRegistration": true,
-                "linkSupport": true
-            },
-            "colorProvider": {
-                "dynamicRegistration": true
-            },
-            "foldingRange": {
-                "dynamicRegistration": true,
-                "rangeLimit": 5000,
-                "lineFoldingOnly": true
-            },
-            "declaration": {
-                "dynamicRegistration": true,
-                "linkSupport": true
-            },
-            "selectionRange": {
-                "dynamicRegistration": true
-            }
-        },
-        "window": {
-            "workDoneProgress": true
-        }
-    },
-    "trace": "verbose",
-    "workspaceFolders": [
-        {
-            "uri": "file:///d%3A/solang_fork_final",
-            "name": "solang_fork_final"
-        }
-    ]
-},"id":1}"#;
-
-const SECOND_REQUEST: &str = r#"{"jsonrpc":"2.0","method":"textDocument/hover","params": {"textDocument":{"uri":"file:///d%3A/solang_fork_final/solang/examples/example.sol"},"position":{"line":152,"character":54}}, "id":1}"#;
-
-fn mock_second_request() -> Vec<u8> {
-
-    format!("Content-Length: {}\r\n\r\n{}", SECOND_REQUEST.len(), SECOND_REQUEST).into_bytes()}
-fn mock_request() -> Vec<u8> {
-
-    format!("Content-Length: {}\r\n\r\n{}", REQUEST.len(), REQUEST).into_bytes()}
-
-fn make_request_string(request: &str) -> Vec<u8> {
-    format!("Content-Length: {}\r\n\r\n{}", request.len(), request).into_bytes()
-}
-
-
-
-
-
-
-
-
-/* 
-#[tokio::main(flavor = "current_thread")]
-pub async fn start_server(request: &str) -> ! {
-    let mut importpaths = Vec::new();
-    let mut importmaps = Vec::new();
-
-   
-
-
-    let mock = mock_request();
-    let mut in_buf: Vec<u8> = Vec::new();
-   
-
-   let (mut stdin, stdout) = tokio::io::duplex(1024);
-
-   stdin.write(mock.as_slice()).await.unwrap();
-   
-
-
-let (service, socket) = LspService::new(|client| SolangServer {
-    client,
-    target: Target::Solana,
-    importpaths,
-    importmaps,
-    files: Mutex::new(Files {
-        caches: HashMap::new(),
-        text_buffers: HashMap::new(),
-    }),
-    global_cache: Mutex::new(GlobalCache {
-        definitions: HashMap::new(),
-        types: HashMap::new(),
-        implementations: HashMap::new(),
-        declarations: HashMap::new(),
-        properties: HashMap::new(),
-    }),
-});
-
-
-let server = Server::new(stdin, stdout, socket);
-server.serve(service).await;
-
-println!("Hello, world!");
-
-std::process::exit(1);
-}*/
 
 impl SolangServer {
 
@@ -2522,10 +2180,7 @@ impl LanguageServer for SolangServer {
     async fn did_change(&self, params: DidChangeTextDocumentParams)  {
 
         let new_content = params.content_changes.first().unwrap().text.clone();
-        /*self.client
-            .log_message(MessageType::INFO, format!("received change: {new_content}"))
-            .await;*/
-
+ 
         let uri = params.text_document.uri;
         let uri_string = uri.to_string();
         
@@ -2544,34 +2199,8 @@ impl LanguageServer for SolangServer {
         }
 
         
-        }
-        /*let uri = params.text_document.uri;
-        let uri_string = uri.to_string();
-        self.client
-            .log_message(MessageType::INFO, format!("received change: {uri}"))
-            .await;
-    
-        match self.url_to_file_path(&uri) {
-            Ok(_) => {
-                if let Some(text_buf) = self.files.lock().await.text_buffers.get_mut(&uri_string) {
-                    for change in params.content_changes {
-                        *text_buf = change.text;
-                    }
-                   
-                }
-                self.client
-                    .log_message(MessageType::INFO, format!("calling parse on {uri}"))
-                    .await;
-                self.parse_file(uri).await;
-            }
-            Err(_) => {
-                self.client
-                    .log_message(MessageType::ERROR, format!("received invalid URI: {uri}"))
-                    .await;
-            }
-        }*/
-    
-    
+    }
+
 
     async fn did_save(&self, params: DidSaveTextDocumentParams) {
         let uri = params.text_document.uri;
